@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdMiner Dashboard</title>
+<style>
+    /* Reset */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0073e6, #001d66);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+        color: #f5f5f5;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 500px;
+        padding: 2rem;
+        background: #ffffff;
+        color: #333;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .container h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #0073e6;
+    }
+
+    /* Balance display */
+    .usd-balance {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 1.5rem 0;
+        padding: 0.5rem 1rem;
+        background: #f0f4f8;
+        color: #0073e6;
+        border-radius: 10px;
+        transition: transform 0.2s;
+    }
+
+    .usd-balance:hover {
+        transform: scale(1.05);
+    }
+
+    /* Button Styles */
+    .buttons, .shop {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    button {
+        width: 90%;
+        max-width: 250px;
+        margin: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        color: #f5f5f5;
+        background: #0073e6;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+        background-color: #005bb5;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Withdrawals & Subscription Info */
+    .withdrawals, .shop p {
+        font-size: 1rem;
+        color: #555;
+        margin: 0.5rem 0;
+    }
+
+    .shop p {
+        color: #333;
+    }
+
+    /* Ads */
+    .ad-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+    }
+
+    .ad {
+        width: 30%;
+        padding: 1rem;
+        background-color: #f0f4f8;
+        color: #0073e6;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, background-color 0.3s;
+    }
+
+    .ad:hover {
+        background-color: #0073e6;
+        color: #fff;
+        transform: translateY(-3px);
+    }
+
+    /* Keyframes */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+<body>
+
+<div id="main-section" class="container">
+    <h1>AdMiner Dashboard</h1>
+    <div class="usd-balance" id="usd-balance">USD: $0.00000000</div>
+
+    <!-- Mining and Withdraw Buttons -->
+    <div class="buttons">
+        <button id="mining-button" onclick="toggleMining()">Start Mining</button>
+        <button onclick="withdraw()">Withdraw</button>
+    </div>
+
+    <!-- Withdrawal Limits -->
+    <div class="withdrawals">
+        <p id="withdrawals-left">Withdrawals left today: 5</p>
+    </div>
+
+    <!-- Shop Section -->
+    <div class="shop">
+        <h3>Upgrade Your Account</h3>
+        <button onclick="buySubscription()">Buy Subscription - $50/month</button>
+        <p>Subscription benefits: 1.5x income & unlimited daily withdrawals</p>
+    </div>
+
+    <!-- Ads Section -->
+    <div class="ad-container">
+        <div class="ad">Ad Template 1</div>
+        <div class="ad">Ad Template 2</div>
+        <div class="ad">Ad Template 3</div>
+    </div>
+</div>
+
+<script>
+    let balance = 0;
+    let earningsPerMillisecond = (5 / 86400000); // 5 USD per day in milliseconds
+    let mining = false;
+    let subscription = false;
+    let dailyWithdrawals = 5;
+
+    function toggleMining() {
+        mining = !mining;
+        document.getElementById('mining-button').textContent = mining ? "End Mining" : "Start Mining";
+    }
+
+    function updateBalance() {
+        if (mining) {
+            balance += earningsPerMillisecond * (subscription ? 1.5 : 1);
+        }
+        document.getElementById('usd-balance').textContent = `USD: $${balance.toFixed(8)}`;
+        requestAnimationFrame(updateBalance);
+    }
+
+    function buySubscription() {
+        if (balance >= 50) {
+            balance -= 50;
+            subscription = true;
+            dailyWithdrawals = Infinity;
+            alert("Subscription activated! Enjoy 1.5x income and unlimited daily withdrawals.");
+        } else {
+            alert("Not enough balance for subscription.");
+        }
+    }
+
+    function withdraw() {
+        if (subscription || dailyWithdrawals > 0) {
+            balance -= Math.min(balance, 10); // Withdrawal amount of $10 or the current balance if lower
+            if (!subscription) dailyWithdrawals--;
+            document.getElementById('withdrawals-left').textContent = `Withdrawals left today: ${dailyWithdrawals}`;
+            alert("Withdraw successful!");
+        } else {
+            alert("Daily withdrawal limit reached. Upgrade to a subscription for unlimited withdrawals.");
+        }
+    }
+
+    updateBalance();
+</script>
+
+</body>
+</html>
